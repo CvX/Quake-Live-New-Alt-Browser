@@ -143,27 +143,32 @@ aServerListView.prototype.UpdateServerNode = function (d, e) {
     e.find(".agamerank").attr({"src": quakelive.resource((d.g_needpass ? "/images/lgi/server_details_ranked.png" : "/images/sf/login/rank_" + r.delta + ".png")), "title": r.desc.replace(/(<([^>]+)>)/ig, '')}).css({"height": "18px", "width": "18px"});
     e.find(".aplayers").text(k);
     d.ordinal < 3 ? e.addClass("bestpick") : e.removeClass("bestpick");
-    var ql_alt_filters = $.cookie('ql_alt_filters');
-    if (ql_alt_filters) {
-        ql_alt_filters = ql_alt_filters.split(",");
-        if (ql_alt_filters[0] && ql_alt_filters[0].length !== 0) {
-            var hm = false, freg;
-            for (var i = 0; i < ql_alt_filters.length; i++) {
-                ql_alt_filters[i] = $.trim(ql_alt_filters[i]);
-                if (ql_alt_filters[i].length === 0) continue;
-                freg = new RegExp(ql_alt_filters[i], "i");
-                if (k.substr(k.indexOf("/")) == ql_alt_filters[i] || l.match(freg) || d.host_name.match(freg) || ((d.map.match(freg) || m.match(freg)) && d.num_clients !== 0)) {
-                    hm = true;
-                    break
+    if ($("#ql_alt_hide:checked").val() == 'on' && (d.num_clients == 0 || d.max_clients == d.num_clients)) {
+        e.hide();
+    } else {
+        var ql_alt_filters = $.cookie('ql_alt_filters');
+        if (ql_alt_filters) {
+            ql_alt_filters = ql_alt_filters.split(",");
+            if (ql_alt_filters[0] && ql_alt_filters[0].length !== 0) {
+                var hm = false, freg;
+
+                for (var i = 0; i < ql_alt_filters.length; i++) {
+                    ql_alt_filters[i] = $.trim(ql_alt_filters[i]);
+                    if (ql_alt_filters[i].length === 0) continue;
+                    freg = new RegExp(ql_alt_filters[i], "i");
+                    if (k.substr(k.indexOf("/")) == ql_alt_filters[i] || l.match(freg) || d.host_name.match(freg) || ((d.map.match(freg) || m.match(freg)) && d.num_clients !== 0)) {
+                        hm = true;
+                        break
+                    }
                 }
+                hm ? e.hide() : e.show();
+            } else {
+                e.show();
             }
-            hm ? e.hide() : e.show();
         } else {
             e.show();
         }
-    } else {
-        e.show();
-    }
+	}
     return e;
 };
 aServerListView.prototype.OnRefreshServersSuccess = function (d) {
@@ -304,11 +309,14 @@ quakelive.mod_home.ShowContent = function (v) {
             $(".postlogin_nav ul li:last").after("<li id='ql_alt_parameters'>Parameters</li>" +
                                                  "<li id='ql_alt_filters'>Filters</li>" +
                                                  "<li id='ql_alt_demo'>Demo</li>" +
-                                                 "<li id='ql_alt_refresh'>Refresh</li>");
+                                                 "<li id='ql_alt_refresh'>Refresh</li>" +
+                                                 "<li id='ql_alt_no_full_empty'><label><input type='checkbox' id='ql_alt_hide' " + $.cookie('ql_alt_hide') + ">&nbsp;Hide full/empty</label></li>");
+
             $("#ql_alt_parameters").click(ql_alt_parameters);
             $("#ql_alt_filters").click(ql_alt_filters);
             $("#ql_alt_demo").click(ql_alt_demo);
             $("#ql_alt_refresh").click(quakelive.mod_home.ReloadServerList).attr("title", "Shift + R");
+            $("#ql_alt_hide").change(ql_alt_hide);
             
             $("#qlv_postlogin_matches").append("<table border='0' id='ql_alt_browser'>" +
                                                "<tbody></tbody>" +
@@ -399,7 +407,7 @@ function aLaunchGameParams(a){a=$.extend({isBotGame:false,isTraining:false,passw
 var ql_alt_parameters=function(){qlPrompt({title:"Parameters",body:"Enter custom parameters to start QL (e.g. +exec mycfg.cfg +devmap qzdm1).",input:true,inputLabel:$.cookie("ql_alt_parameters"),inputReadOnly:false,alert:false,ok:function(){var ql_alt_parameters=$("#modal-input > input").val();$.cookie("ql_alt_parameters",ql_alt_parameters,{expires:1,path:'/'});$("#prompt").jqmHide();if(ql_alt_parameters){var k=new aLaunchGameParams;k.Append(ql_alt_parameters);LaunchGame(k)}}});return false}
 var ql_alt_filters=function(){qlPrompt({title:"Filters",body:"Enter your filters separated by commas.  Possible values:\n<ul><li><b>Location:</b> \"New York\" or \"Warsaw #2\"</li><li><b>Full or short map name:</b> \"Campgrounds\" or \"qzdm6\"</li><li><b>Full game mode name:</b> \"Free For All\", \"Large Clan Arena\", etc.</li><li><b>Server slot size:</b> \"/16\"</li><li><b>Combined:</b> \"New York, Warsaw #2, qzdm6, Free For All, Large Clan Arena, /16\"</ul>",input:true,inputLabel:$.cookie("ql_alt_filters"),inputReadOnly:false,alert:false,ok:function(){var ql_alt_filters=$("#modal-input > input").val(),tmp=$.cookie("ql_alt_filters");$("#prompt").jqmHide();$.cookie("ql_alt_filters",ql_alt_filters.toLowerCase(),{expires:30,path:'/'});if(tmp!=ql_alt_filters)quakelive.mod_home.ReloadServerList()}});return false}
 var ql_alt_demo=function(){qlPrompt({title:"Demo",body:"Enter a demo name to play.  \"demo.cfg\" will automatically be executed, if it exists.",input:true,inputLabel:$.cookie('ql_alt_demo'),inputReadOnly:false,alert:false,ok:function(){var ql_alt_demo=$('#modal-input > input').val();$("#prompt").jqmHide();$.cookie('ql_alt_demo',ql_alt_demo,{expires:1,path:'/'});if(ql_alt_demo){var k=new aLaunchGameParams;k.Append("+exec demo.cfg +demo \""+ql_alt_demo+"\"");LaunchGame(k)}}});return false}
-
+var ql_alt_hide=function(){$.cookie('ql_alt_hide',$('#ql_alt_hide').val() == 'on' ? 'checked' : '',{expires:1,path:'/'});quakelive.mod_home.ReloadServerList();return false;}
 
 
 
