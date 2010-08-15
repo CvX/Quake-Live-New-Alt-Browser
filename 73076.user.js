@@ -133,7 +133,7 @@ aServerListView.prototype.UpdateServerNode = function (d, e) {
                                                     '<td align="left" class="alocation_text"></td>' +
                                                     '<td align="left"><img src="" class="agameicon" /></td>' +
                                                     '<td align="left"><span class="amapname bold"></span><span class="agamelabel cond"></span></td>' +
-                                                    '<td align="left"><img src="" class="agamerank" /> <a href="' + quakelive.siteConfig.baseUrl + '/r/home/join/' + d.public_id + '" onclick="qlPrompt({title: \'Server Link\', body: \'Link to this game\', input: true, inputLabel: $(this).attr(\'href\'), inputReadOnly: true, alert: true}); return false;"><img style="padding: 3px 0" src="http://phob.net/link.png" title="Link to this game" class="link" /></a></td>' +
+                                                    '<td align="left"><img src="" class="agamerank" style="float: left;" /> <a href="' + quakelive.siteConfig.baseUrl + '/r/home/join/' + d.public_id + '" onclick="qlPrompt({title: \'Server Link\', body: \'Link to this game\', input: true, inputLabel: $(this).attr(\'href\'), inputReadOnly: true, alert: true}); return false;" class="link share_link_img" title="Link to this game" style="float: left; margin-top: 3px; margin-left: 4px;"></a></td>' +
                                                     '<td align="left" class="aplayers"></td>');
     e.find(".alocation_flag").attr({"src": quakelive.resource(p), "title": n.country || "United States"});
     e.find(".alocation_text").text(l);
@@ -330,7 +330,7 @@ quakelive.mod_home.ShowContent = function (v) {
                                                "</tr></thead>" +
                                                "</table>");
             $("#ql_alt_browser").find("tbody")
-                                .append("<tr><td><img class='alocation_flag' src='a.gif' /></td><td class='alocation_text'>a</td><td><img src='a.gif' class='agameicon' /></td><td><span class='amapname'>qzdm1</span><span class='agamelabel'>a</span></td><td><img src='#' class='agamerank' /><img src='http://phob.net/link.png' /></td><td class='aplayers'>0/128</td></tr>")
+                                .append("<tr><td><img class='alocation_flag' src='a.gif' /></td><td class='alocation_text'>a</td><td><img src='a.gif' class='agameicon' /></td><td><span class='amapname'>qzdm1</span><span class='agamelabel'>a</span></td><td><img src='#' class='agamerank' style='float: left;' /> <a href='#' class='link share_link_img' style='float: left; margin-top: 3px; margin-left: 4px;'></a></td><td class='aplayers'>0/128</td></tr>")
                                 .end()
                                 .tablesorter({debug: false, sortList: ($.evalJSON($.cookie('ql_alt_browser_sort')) || [[5,1]]), headers: {4: {sorter: 'rank'}, 5: {sorter: 'players'}}, widgets: ['zebra','sortPersist']})
                                 .bind("sortEnd",function(){ $(".contextMenu").destroyContextMenu().hide(); quakelive.HideTooltip(); })
