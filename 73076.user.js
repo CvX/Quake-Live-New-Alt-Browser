@@ -161,14 +161,14 @@ aServerListView.prototype.UpdateServerNode = function (d, e) {
                         break
                     }
                 }
-                hm ? e.hide() : e.show();
+                hm ? e.css('display', 'table-row') : e.hide();
             } else {
-                e.show();
+                e.css('display', 'table-row');
             }
         } else {
-            e.show();
+            e.css('display', 'table-row');
         }
-	}
+    }
     return e;
 };
 aServerListView.prototype.OnRefreshServersSuccess = function (d) {
