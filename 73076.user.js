@@ -422,8 +422,9 @@ var css = ".postlogin_nav ul li { font-weight:bold; } \n" +
           "#qlv_postlogin_matches p { background: transparent; } \n" +
           "#ql_alt_browser { width: " + (screen.width < 1280 ? screen.width < 1024 ? "52%" : "85%" : "100%") + "; color: black; background-color: rgba(255, 255, 255, 0.4); } \n" +
           "#ql_alt_browser thead tr { background: url('" + quakelive.resource('/images/postlogin_navbar/nav_bar.png') + "') -10px 0px } \n" +
-          "#ql_alt_browser thead th { color: white; font-weight: bold; } \n" +
-          "#ql_alt_browser thead th, .bestpick { text-shadow: 1px 1px 5px #f00; filter: dropshadow(color=#f00, offx=1, offy=1); } \n" +
+          "#ql_alt_browser thead th { color: white; font-weight: bold; text-shadow: 1px 1px 5px #666; filter: dropshadow(color=#666, offx=1, offy=1); } \n" +
+          "#ql_alt_browser thead th.headerSortUp, .bestpick { text-shadow: 1px 1px 5px #f44; filter: dropshadow(color=#f44, offx=1, offy=1); } \n" +
+          "#ql_alt_browser thead th.headerSortDown { text-shadow: 1px 1px 5px #fb4; filter: dropshadow(color=#fb4, offx=1, offy=1); } \n" +
           ".noHighlight { text-shadow: none; filter: none; } \n" +
           ".alocation_flag { width: 16px; height: 11px } \n" +
           ".agameicon { padding: 1px 0 } \n" +
