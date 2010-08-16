@@ -143,32 +143,42 @@ aServerListView.prototype.UpdateServerNode = function (d, e) {
     e.find(".agamerank").attr({"src": quakelive.resource((d.g_needpass ? "/images/lgi/server_details_ranked.png" : "/images/sf/login/rank_" + r.delta + ".png")), "title": r.desc.replace(/(<([^>]+)>)/ig, '')}).css({"height": "18px", "width": "18px"});
     e.find(".aplayers").text(k);
     d.ordinal < 3 ? e.addClass("bestpick") : e.removeClass("bestpick");
+    var hide_entry = false;
     if ($("#ql_alt_hide:checked").val() == 'on' && (d.num_clients == 0 || d.max_clients == d.num_clients)) {
-        e.hide();
+        hide_entry = true;
     } else {
-        var ql_alt_filters = $.cookie('ql_alt_filters');
+        var ql_alt_filters = $.cookie('ql_alt_filters'), ql_alt_include = $.cookie('ql_alt_include'), freg;
+        if (ql_alt_include) {
+            ql_alt_include = ql_alt_include.split(",");
+            if (ql_alt_include[0] && ql_alt_include[0].length !== 0) {
+                hide_entry = true;
+                for (var i = 0; i < ql_alt_include.length; i++) {
+                    ql_alt_include[i] = $.trim(ql_alt_include[i]);
+                    if (ql_alt_include[i].length === 0) continue;
+                    freg = new RegExp(ql_alt_include[i], "i");
+                    if (k.substr(k.indexOf("/")) == ql_alt_include[i] || l.match(freg) || d.host_name.match(freg) || ((d.map.match(freg) || m.match(freg)) && d.num_clients !== 0)) {
+                        hide_entry = false;
+                        break
+                    }
+                }
+            }
+        }
         if (ql_alt_filters) {
             ql_alt_filters = ql_alt_filters.split(",");
             if (ql_alt_filters[0] && ql_alt_filters[0].length !== 0) {
-                var hm = false, freg;
-
                 for (var i = 0; i < ql_alt_filters.length; i++) {
                     ql_alt_filters[i] = $.trim(ql_alt_filters[i]);
                     if (ql_alt_filters[i].length === 0) continue;
                     freg = new RegExp(ql_alt_filters[i], "i");
                     if (k.substr(k.indexOf("/")) == ql_alt_filters[i] || l.match(freg) || d.host_name.match(freg) || ((d.map.match(freg) || m.match(freg)) && d.num_clients !== 0)) {
-                        hm = true;
+                        hide_entry = true;
                         break
                     }
                 }
-                hm ? e.css('display', 'table-row') : e.hide();
-            } else {
-                e.css('display', 'table-row');
             }
-        } else {
-            e.css('display', 'table-row');
         }
     }
+    hide_entry ? e.hide() : e.css('display', 'table-row');
     return e;
 };
 aServerListView.prototype.OnRefreshServersSuccess = function (d) {
@@ -405,7 +415,7 @@ quakelive.matchtip.DisplayMatchPlayers=function(e){var d={Free:0,Red:1,Blue:2,Sp
 /* features */
 function aLaunchGameParams(a){a=$.extend({isBotGame:false,isTraining:false,password:null,hasFullscreen:false},a);this.isBotGame=a.isBotGame;this.isTraining=a.isTraining;this.password=a.password;this.hasFullscreen=quakelive.cvars.GetIntegerValue("r_fullscreen",0)!=0;this.cmdStrings=[]}aLaunchGameParams.prototype.Append=function(a){this.cmdStrings.push(a)};aLaunchGameParams.prototype.Prepend=function(a){this.cmdStrings.shift(a)};aLaunchGameParams.prototype.GetCommandLine=function(){var a=quakelive.cvars.Get("model");quakelive.cvars.Set("headmodel",a.value);quakelive.cvars.Set("team_model",a.value);quakelive.cvars.Set("team_headmodel",a.value);quakelive.cfgUpdater.StoreConfig(quakelive.cfgUpdater.CFG_BIT_REP);a="";if(quakelive.siteConfig.premiumStatus=="standard"&&!this.isTraining)a+="+set in_nograb 1 ";a+="+set r_fullscreen "+quakelive.cvars.GetIntegerValue("r_fullscreen",0)+" ";a+='+set gt_user "'+pluginx.username+'" ';a+='+set gt_pass "'+pluginx.password+'" ';a+='+set gt_realm "'+quakelive.siteConfig.realm+'" ';if(typeof this.password=="string")a+='+set password "'+this.password+'" ';a+=this.cmdStrings.join(" ");return a}
 var ql_alt_parameters=function(){qlPrompt({title:"Parameters",body:"Enter custom parameters to start QL (e.g. +exec mycfg.cfg +devmap qzdm1).",input:true,inputLabel:$.cookie("ql_alt_parameters"),inputReadOnly:false,alert:false,ok:function(){var ql_alt_parameters=$("#modal-input > input").val();$.cookie("ql_alt_parameters",ql_alt_parameters,{expires:1,path:'/'});$("#prompt").jqmHide();if(ql_alt_parameters){var k=new aLaunchGameParams;k.Append(ql_alt_parameters);LaunchGame(k)}}});return false}
-var ql_alt_filters=function(){qlPrompt({title:"Filters",body:"Enter your filters separated by commas.  Possible values:\n<ul><li><b>Location:</b> \"New York\" or \"Warsaw #2\"</li><li><b>Full or short map name:</b> \"Campgrounds\" or \"qzdm6\"</li><li><b>Full game mode name:</b> \"Free For All\", \"Large Clan Arena\", etc.</li><li><b>Server slot size:</b> \"/16\"</li><li><b>Combined:</b> \"New York, Warsaw #2, qzdm6, Free For All, Large Clan Arena, /16\"</ul>",input:true,inputLabel:$.cookie("ql_alt_filters"),inputReadOnly:false,alert:false,ok:function(){var ql_alt_filters=$("#modal-input > input").val(),tmp=$.cookie("ql_alt_filters");$("#prompt").jqmHide();$.cookie("ql_alt_filters",ql_alt_filters.toLowerCase(),{expires:30,path:'/'});if(tmp!=ql_alt_filters)quakelive.mod_home.ReloadServerList()}});return false}
+var ql_alt_filters=function(){qlPrompt({title:"Filters",body:"Enter your filters separated by commas.  Possible values:\n<ul><li><b>Location:</b> \"New York\" or \"Warsaw #2\"</li><li><b>Map name:</b> \"Campgrounds\" or \"IronWorks\"</li><li><b>Full game mode name:</b> \"Free For All\", \"Large Clan Arena\", etc.</li><li><b>Server slot size:</b> \"/16\"</li><li><b>Combined:</b> \"New York, Warsaw #2, Trinity, Free For All, Large Clan Arena, /16\"</ul>",input:true,inputLabel:$.cookie("ql_alt_filters"),inputReadOnly:false,alert:false,ok:function(){var ql_alt_filters=$("#modal-input > input").val(),tmp=$.cookie("ql_alt_filters");ql_alt_include=$("#ql_alt_include").val(),tmp_incl=$.cookie("ql_alt_include");$("#prompt").jqmHide();$.cookie("ql_alt_filters",ql_alt_filters.toLowerCase(),{expires:30,path:'/'});$.cookie("ql_alt_include",ql_alt_include.toLowerCase(),{expires:30,path:'/'});if(tmp!=ql_alt_filters||tmp_incl!=ql_alt_include)quakelive.mod_home.ReloadServerList()}});$('#modal-input').css('display', 'inline-block');$('<span>Exclude:</span>').insertBefore('#modal-input');var incl_val="";if($.cookie("ql_alt_include"))incl_val=$.cookie("ql_alt_include");$('<span>Include only:&nbsp;</span><div style="display: inline-block;"><input type="text" id="ql_alt_include" value="'+incl_val+'"></div>').insertAfter('#modal-input');return false}
 var ql_alt_demo=function(){qlPrompt({title:"Demo",body:"Enter a demo name to play.  \"demo.cfg\" will automatically be executed, if it exists.",input:true,inputLabel:$.cookie('ql_alt_demo'),inputReadOnly:false,alert:false,ok:function(){var ql_alt_demo=$('#modal-input > input').val();$("#prompt").jqmHide();$.cookie('ql_alt_demo',ql_alt_demo,{expires:1,path:'/'});if(ql_alt_demo){var k=new aLaunchGameParams;k.Append("+exec demo.cfg +demo \""+ql_alt_demo+"\"");LaunchGame(k)}}});return false}
 var ql_alt_hide=function(){$.cookie('ql_alt_hide',$('#ql_alt_hide').val() == 'on' ? 'checked' : '',{expires:1,path:'/'});quakelive.mod_home.ReloadServerList();return false;}
 
