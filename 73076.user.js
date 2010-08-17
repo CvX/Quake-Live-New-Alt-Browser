@@ -320,7 +320,9 @@ quakelive.mod_home.ShowContent = function (v) {
                                                  "<li id='ql_alt_filters'>Filters</li>" +
                                                  "<li id='ql_alt_demo'>Demo</li>" +
                                                  "<li id='ql_alt_refresh'>Refresh</li>" +
-                                                 "<li id='ql_alt_no_full_empty'><label><input type='checkbox' id='ql_alt_hide' " + $.cookie('ql_alt_hide') + ">&nbsp;Hide full/empty</label></li>");
+                                                 "<li id='ql_alt_no_full_empty'><label><input type='checkbox' id='ql_alt_hide'>&nbsp;Hide full/empty</label></li>");
+
+            if ($.cookie('ql_alt_hide') == 'true') { $("#ql_alt_hide").attr("checked", true); }
 
             $("#ql_alt_parameters").click(ql_alt_parameters);
             $("#ql_alt_filters").click(ql_alt_filters);
@@ -417,7 +419,7 @@ function aLaunchGameParams(a){a=$.extend({isBotGame:false,isTraining:false,passw
 var ql_alt_parameters=function(){qlPrompt({title:"Parameters",body:"Enter custom parameters to start QL (e.g. +exec mycfg.cfg +devmap qzdm1).",input:true,inputLabel:$.cookie("ql_alt_parameters"),inputReadOnly:false,alert:false,ok:function(){var ql_alt_parameters=$("#modal-input > input").val();$.cookie("ql_alt_parameters",ql_alt_parameters,{expires:1,path:'/'});$("#prompt").jqmHide();if(ql_alt_parameters){var k=new aLaunchGameParams;k.Append(ql_alt_parameters);LaunchGame(k)}}});return false}
 var ql_alt_filters=function(){qlPrompt({title:"Filters",body:"Enter your filters separated by commas.  Possible values:\n<ul><li><b>Location:</b> \"New York\" or \"Warsaw #2\"</li><li><b>Map name:</b> \"Campgrounds\" or \"IronWorks\"</li><li><b>Full game mode name:</b> \"Free For All\", \"Large Clan Arena\", etc.</li><li><b>Server slot size:</b> \"/16\"</li><li><b>Combined:</b> \"New York, Warsaw #2, Trinity, Free For All, Large Clan Arena, /16\"</ul>",input:true,inputLabel:$.cookie("ql_alt_filters"),inputReadOnly:false,alert:false,ok:function(){var ql_alt_filters=$("#modal-input > input").val(),tmp=$.cookie("ql_alt_filters");ql_alt_include=$("#ql_alt_include").val(),tmp_incl=$.cookie("ql_alt_include");$("#prompt").jqmHide();$.cookie("ql_alt_filters",ql_alt_filters.toLowerCase(),{expires:30,path:'/'});$.cookie("ql_alt_include",ql_alt_include.toLowerCase(),{expires:30,path:'/'});if(tmp!=ql_alt_filters||tmp_incl!=ql_alt_include){(ql_alt_filters||ql_alt_include)?$('#ql_alt_filters').addClass('filter_enabled'):$('#ql_alt_filters').removeClass('filter_enabled');quakelive.mod_home.ReloadServerList()}}});$('#modal-input').css('display', 'inline-block');$('<span>Exclude:</span>').insertBefore('#modal-input');var incl_val="";if($.cookie("ql_alt_include"))incl_val=$.cookie("ql_alt_include");$('<span>Include only:&nbsp;</span><div style="display: inline-block;"><input type="text" id="ql_alt_include" value="'+incl_val+'"></div>').insertAfter('#modal-input');return false}
 var ql_alt_demo=function(){qlPrompt({title:"Demo",body:"Enter a demo name to play.  \"demo.cfg\" will automatically be executed, if it exists.",input:true,inputLabel:$.cookie('ql_alt_demo'),inputReadOnly:false,alert:false,ok:function(){var ql_alt_demo=$('#modal-input > input').val();$("#prompt").jqmHide();$.cookie('ql_alt_demo',ql_alt_demo,{expires:1,path:'/'});if(ql_alt_demo){var k=new aLaunchGameParams;k.Append("+exec demo.cfg +demo \""+ql_alt_demo+"\"");LaunchGame(k)}}});return false}
-var ql_alt_hide=function(){$.cookie('ql_alt_hide',$('#ql_alt_hide').val() == 'on' ? 'checked' : '',{expires:1,path:'/'});quakelive.mod_home.ReloadServerList();return false;}
+var ql_alt_hide=function(){$.cookie('ql_alt_hide',$('#ql_alt_hide').is(':checked'),{expires:30,path:'/'});quakelive.mod_home.ReloadServerList();return false;}
 
 
 
